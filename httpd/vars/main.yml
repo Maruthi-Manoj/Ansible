@@ -1,0 +1,3 @@
+---
+# vars file for httpd
+port_num: 5002

@@ -1,0 +1,56 @@
+---
+# tasks file for nginx
+- name: Define nginx_user.
+  set_fact:
+    nginx_user: "nginx"
+  tags:    
+      - nginx
+      - nginx_config
+
+- name: create log dir
+  file:
+    dest: "/app/logs/nginx"
+    owner: nginx
+    group: nginx
+    recurse: yes  
+    state: directory
+  tags:
+    - nginx 
+
+- name: Ensure nginx is installed.
+  yum:
+    name: "nginx"
+    state: installed
+  tags:    
+      - nginx
+
+- name: Disable SELinux at next reboot
+  selinux:
+    state: disabled 
+    
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: setenforce 0
+  ignore_errors: true
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  tags:
+    - nginx
+
+- name: Copy nginx global conf.
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nginx 
+  tags:    
+      - nginx
+      - nginx_config
+
+

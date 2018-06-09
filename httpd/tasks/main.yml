@@ -1,0 +1,52 @@
+---
+# tasks file for httpd
+- name: Define httpd_user.
+  set_fact:
+    httpd_user: "apache"
+  tags:
+      - httpd
+      - httpd_config
+
+- name: create log dir
+  file:
+    dest: "/app/logs/httpd"
+    owner: apache
+    group: apache
+    recurse: yes
+    state: directory
+  tags:
+    - httpd
+
+- name: Ensure httpd is installed.
+  yum:
+    name: "httpd"
+    state: installed
+  tags:
+      - httpd
+
+- name: Disable SELinux at next reboot
+  selinux:
+    state: disabled
+
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: setenforce 0
+  ignore_errors: true
+
+- name: start httpd
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+  tags:
+    - httpd
+
+- name: Copy httpd global conf.
+  template:
+    src: httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart httpd
+                         

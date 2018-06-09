@@ -1,0 +1,5 @@
+---
+- hosts: httpd
+  become: yes
+  roles:
+     - httpd

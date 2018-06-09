@@ -1,0 +1,3 @@
+---
+# vars file for nginx
+port_num: 9001
